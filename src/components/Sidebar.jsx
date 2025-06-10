@@ -19,7 +19,7 @@ const Sidebar = ({ userRole, setUserRole }) => {
    <div className="bg-slate-100 dark:bg-slate-800 p-4 flex flex-col items-center lg:items-start lg:w-56 sticky top-0 h-screen shadow-md dark:shadow-none">
      <div className="flex items-center gap-3 mb-10 p-2">
        <BsClouds className="text-3xl text-blue-500 dark:text-white" />
-       <span className="text-xl font-bold hidden lg:inline text-slate-800 dark:text-white">Weatherly</span>
+       <span className="text-xl font-bold hidden lg:inline text-slate-800 dark:text-white">Weather app Riau </span>
      </div>
      <nav className="flex flex-col gap-4 w-full flex-1">
        {menuItems.map((item) => (
