@@ -1,34 +1,72 @@
 // src/pages/CitiesPage.jsx
-import React from 'react';
-import { BsPinMapFill } from 'react-icons/bs';
+import React, { useState, useContext } from 'react';
+import { FavoritesContext } from '../context/FavoritesContext';
+import { BsTrash, BsPlusCircleFill } from 'react-icons/bs';
 
 const CitiesPage = () => {
-  const riauCities = [
-    { name: 'Pekanbaru', description: 'Ibu kota dan kota terbesar di Provinsi Riau.' },
-    { name: 'Dumai', description: 'Kota pelabuhan utama dengan industri minyak yang signifikan.' },
-    { name: 'Duri', description: 'Terkenal sebagai pusat industri minyak dan gas di Riau.' },
-    { name: 'Rengat', description: 'Ibu kota Kabupaten Indragiri Hulu, memiliki sejarah kerajaan.' },
-    { name: 'Tembilahan', description: 'Ibu kota Kabupaten Indragiri Hilir, dikenal dengan kebun kelapanya.' },
-    { name: 'Bangkinang', description: 'Ibu kota Kabupaten Kampar, dekat dengan Candi Muara Takus.' },
-    { name: 'Siak Sri Indrapura', description: 'Kota bersejarah dengan Istana Siak yang megah.' },
-    { name: 'Pangkalan Kerinci', description: 'Ibu kota Kabupaten Pelalawan, pusat industri pulp dan kertas.' },
-  ];
+  // Ambil semua yang kita butuhkan dari FavoritesContext
+  const { favoriteCities, addFavorite, removeFavorite } = useContext(FavoritesContext);
+  
+  // State lokal hanya untuk mengelola input dari form
+  const [newCity, setNewCity] = useState('');
+
+  const handleAddCity = (e) => {
+    e.preventDefault(); // Mencegah form dari refresh halaman
+    if (newCity.trim()) { // Pastikan input tidak kosong
+      addFavorite(newCity.trim()); // Tambahkan kota baru
+      setNewCity(''); // Kosongkan kembali input field
+    }
+  };
 
   return (
     <div className="animate-fade-in-up">
-      <h1 className="text-3xl font-bold mb-6">Kota & Kabupaten di Riau</h1>
-      
-      {/* --- PERUBAHAN DI SINI --- */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {riauCities.map((city) => (
-          <div key={city.name} className="bg-slate-100 dark:bg-slate-800 p-6 rounded-2xl shadow-lg dark:shadow-none">
-            <div className="flex items-center gap-3 mb-2">
-              <BsPinMapFill className="text-blue-500 dark:text-blue-400" />
-              <h2 className="text-xl font-bold text-slate-800 dark:text-white">{city.name}</h2>
-            </div>
-            <p className="text-slate-600 dark:text-slate-400">{city.description}</p>
-          </div>
-        ))}
+      <h1 className="text-3xl font-bold mb-8">Kelola Kota Favorit</h1>
+
+      {/* Form untuk Menambah Kota Baru */}
+      <div className="bg-slate-100 dark:bg-slate-800 p-6 rounded-2xl mb-8 shadow-lg dark:shadow-none">
+        <h2 className="text-xl font-bold mb-4">Tambah Kota Baru</h2>
+        <form onSubmit={handleAddCity} className="flex gap-4">
+          <input
+            type="text"
+            value={newCity}
+            onChange={(e) => setNewCity(e.target.value)}
+            placeholder="Ketik nama kota..."
+            className="w-full px-4 py-2 rounded-lg bg-white dark:bg-slate-700 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            type="submit"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <BsPlusCircleFill />
+            <span>Tambah</span>
+          </button>
+        </form>
+      </div>
+
+      {/* Daftar Kota Favorit Saat Ini */}
+      <div className="bg-slate-100 dark:bg-slate-800 p-6 rounded-2xl shadow-lg dark:shadow-none">
+        <h2 className="text-xl font-bold mb-4">Daftar Favorit</h2>
+        <div className="space-y-3">
+          {favoriteCities.length > 0 ? (
+            favoriteCities.map(city => (
+              <div 
+                key={city} 
+                className="flex justify-between items-center bg-slate-200 dark:bg-slate-700/50 p-3 rounded-lg"
+              >
+                <span className="font-medium">{city.split(',')[0]}</span>
+                <button 
+                  onClick={() => removeFavorite(city)}
+                  className="text-red-500 hover:text-red-700 dark:hover:text-red-400 transition-colors text-xl"
+                  title={`Hapus ${city.split(',')[0]}`}
+                >
+                  <BsTrash />
+                </button>
+              </div>
+            ))
+          ) : (
+            <p className="text-slate-500 dark:text-slate-400">Anda belum memiliki kota favorit.</p>
+          )}
+        </div>
       </div>
     </div>
   );

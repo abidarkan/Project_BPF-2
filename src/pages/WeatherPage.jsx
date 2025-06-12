@@ -1,29 +1,33 @@
 // src/pages/WeatherPage.jsx
 import React, { useState, useEffect, useContext } from 'react';
+import { useParams, useNavigate } from 'react-router-dom'; // <-- Impor useNavigate, hapus BsSearch
 import { SettingsContext } from '../context/SettingsContext';
+import { FavoritesContext } from '../context/FavoritesContext';
 import ForecastItem from '../components/ForecastItem';
 import HourlyChart from '../components/HourlyChart';
-import { BsSearch, BsWind, BsDroplet, BsSun } from 'react-icons/bs';
+import { BsWind, BsDroplet, BsSun, BsStar, BsStarFill } from 'react-icons/bs'; // <-- Impor ikon bintang
 
 const WeatherPage = () => {
+  const { cityName } = useParams();
+  const navigate = useNavigate(); // <-- Inisialisasi hook navigasi
   const { units } = useContext(SettingsContext);
+  const { favoriteCities, addFavorite, removeFavorite } = useContext(FavoritesContext);
   const unitSymbol = units === 'metric' ? '°C' : '°F';
   
-  const [selectedCity, setSelectedCity] = useState('Pekanbaru');
-  const [searchInput, setSearchInput] = useState("");
   const [currentWeather, setCurrentWeather] = useState(null);
   const [forecast, setForecast] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
   const API_KEY = 'e36f009e055d14d197eb428b19b26fed';
 
   useEffect(() => {
-    if (!selectedCity) return;
     const fetchAllData = async () => {
       setLoading(true);
       setError(null);
-      const currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${selectedCity}&appid=${API_KEY}&units=${units}&lang=id`;
-      const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${selectedCity}&appid=${API_KEY}&units=${units}&lang=id`;
+      const cityToFetch = cityName || 'Pekanbaru'; // Gunakan cityName dari URL, atau Pekanbaru sebagai default
+      const currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${cityToFetch},ID&appid=${API_KEY}&units=${units}&lang=id`;
+      const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${cityToFetch},ID&appid=${API_KEY}&units=${units}&lang=id`;
       try {
         const [currentWeatherRes, forecastRes] = await Promise.all([ fetch(currentWeatherUrl), fetch(forecastUrl) ]);
         if (!currentWeatherRes.ok || !forecastRes.ok) { throw new Error('Kota tidak ditemukan. Coba nama lain.'); }
@@ -40,12 +44,21 @@ const WeatherPage = () => {
       }
     };
     fetchAllData();
-  }, [selectedCity, units]);
+  }, [cityName, units]); // <-- useEffect sekarang bergantung pada cityName dari URL
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchInput) setSelectedCity(`${searchInput},ID`);
+  // Cek apakah kota saat ini ada di daftar favorit
+  const isFavorite = currentWeather && favoriteCities.includes(currentWeather.name);
+
+  const handleFavoriteToggle = () => {
+    if (!currentWeather) return;
+    if (isFavorite) {
+      removeFavorite(currentWeather.name);
+    } else {
+      addFavorite(currentWeather.name);
+    }
   };
+  
+  const getCityDisplayName = (city) => city.split(',')[0];
 
   const DetailCard = ({ icon, title, value }) => (
     <div className="flex items-center gap-4">
@@ -59,16 +72,23 @@ const WeatherPage = () => {
 
   return (
     <div className="animate-fade-in-up">
-      <form onSubmit={handleSearch} className="flex items-center w-full max-w-3xl mb-8 border-b-2 border-slate-200 dark:border-slate-700 pb-4">
-        <BsSearch className="text-slate-500 dark:text-slate-400 mr-4 text-xl" />
-        <input
-          type="text"
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          placeholder="Cari kota..."
-          className="w-full bg-transparent text-lg placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none"
-        />
-      </form>
+      {/* --- BAGIAN PENCARIAN DIHAPUS DAN DIGANTI DENGAN TOMBOL FAVORIT --- */}
+      <div className="flex flex-wrap items-center gap-3 mb-8 border-b-2 border-slate-200 dark:border-slate-700 pb-4">
+        {favoriteCities.map(city => (
+          <button
+            key={city}
+            onClick={() => navigate(`/weather/${getCityDisplayName(city)}`)}
+            className={`px-4 py-2 rounded-full font-semibold transition-colors duration-300
+              ${getCityDisplayName(city) === cityName
+                ? 'bg-blue-600 text-white shadow-lg'
+                : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600'
+              }`}
+          >
+            {getCityDisplayName(city)}
+          </button>
+        ))}
+      </div>
+
 
       {loading && <div className="flex justify-center items-center h-full"><p className="text-xl">Memuat...</p></div>}
       {error && !loading && <div className="flex justify-center items-center h-full"><p className="text-xl text-red-500">{error}</p></div>}
@@ -76,13 +96,15 @@ const WeatherPage = () => {
       {currentWeather && forecast && !loading && (
         <div className="grid grid-cols-1 lg:grid-cols-3 lg:grid-rows-2 gap-6">
           
-          <div className="lg:col-span-2 bg-slate-100 dark:bg-slate-800 p-6 rounded-2xl flex justify-between items-center shadow-lg dark:shadow-none">
+          <div className="lg:col-span-2 bg-slate-100 dark:bg-slate-800 p-6 rounded-2xl flex justify-between items-start shadow-lg dark:shadow-none">
             <div>
               <h2 className="text-3xl font-bold">{currentWeather.name}</h2>
               <p className="text-slate-500 dark:text-slate-400">Peluang Hujan: {currentWeather.clouds.all}%</p>
               <p className="text-8xl font-thin my-4">{Math.round(currentWeather.main.temp)}{unitSymbol}</p>
             </div>
-            <img src={`https://openweathermap.org/img/wn/${currentWeather.weather[0].icon}@4x.png`} alt="ikon cuaca" className="w-40 h-40" />
+            <button onClick={handleFavoriteToggle} className="text-2xl text-yellow-400 hover:scale-110 transition-transform" title="Tambah/Hapus Favorit">
+              {isFavorite ? <BsStarFill /> : <BsStar />}
+            </button>
           </div>
 
           <div className="lg:row-span-2 bg-slate-100 dark:bg-slate-800 p-6 rounded-2xl shadow-lg dark:shadow-none">

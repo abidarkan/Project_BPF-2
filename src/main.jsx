@@ -4,15 +4,18 @@ import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './index.css';
 import { BrowserRouter } from "react-router-dom";
-import { SettingsProvider } from './context/SettingsContext'; // <-- Impor Provider
+import { SettingsProvider } from './context/SettingsContext';
+import { FavoritesProvider } from './context/FavoritesContext'; // <-- Impor provider baru
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    {/* Bungkus semuanya dengan SettingsProvider */}
     <SettingsProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      {/* Bungkus dengan FavoritesProvider */}
+      <FavoritesProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </FavoritesProvider>
     </SettingsProvider>
   </React.StrictMode>,
 )
