@@ -1,102 +1,80 @@
 // src/components/Sidebar.jsx
-import React, { useContext } from 'react';
-import { NavLink } from 'react-router-dom';
-import { FavoritesContext } from '../context/FavoritesContext';
-import { BsClouds, BsListUl, BsGeoAlt, BsGear, BsCloudSun, BsShieldLock, BsStarFill } from 'react-icons/bs';
+import React, { useState, useEffect } from 'react';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
+import { BsClouds, BsListUl, BsGeoAlt, BsGear, BsCloudSun, BsShieldLock, BsBoxArrowRight } from 'react-icons/bs';
+import { BsInfoCircleFill } from 'react-icons/bs';
 
-const Sidebar = ({ userRole, setUserRole }) => {
-  const { favoriteCities } = useContext(FavoritesContext);
+// import { FavoritesContext } from '../context/FavoritesContext';
 
-  // --- PERUBAHAN DI SINI: Mengembalikan menu utama ke struktur yang Anda minta ---
-  const menuItems = [
-    { icon: <BsCloudSun />, name: 'Cuaca', path: '/weather/Pekanbaru' },
-    { icon: <BsListUl />, name: 'Kota', path: '/cities' },
-    { icon: <BsGeoAlt />, name: 'Peta', path: '/map' },
-    { icon: <BsGear />, name: 'Pengaturan', path: '/settings' },
-  ];
+const Sidebar = () => {
+  const [currentUser, setCurrentUser] = useState(null);
+  const navigate = useNavigate();
 
-  const handleRoleChange = () => {
-    setUserRole(prevRole => (prevRole === 'guest' ? 'admin' : 'guest'));
+  useEffect(() => {
+    const loggedInUser = localStorage.getItem('loggedInUser');
+    if (loggedInUser) {
+      setCurrentUser(JSON.parse(loggedInUser));
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('loggedInUser');
+    setCurrentUser(null);
+    navigate('/login');
   };
 
-  const getCityDisplayName = (city) => city.split(',')[0];
+  // --- PERUBAHAN DI SINI: Semua path sekarang diawali dengan /app ---
+  const menuItems = [
+    { icon: <BsCloudSun />, name: 'Cuaca', path: '/app/weather/Pekanbaru' },
+    { icon: <BsListUl />, name: 'Kota', path: '/app/cities' },
+    { icon: <BsGeoAlt />, name: 'Peta', path: '/app/map' },
+    { icon: <BsGear />, name: 'Pengaturan', path: '/app/settings' },
+    { icon: <BsInfoCircleFill />, name: 'Tentang', path: '/app/about' },
+  ];
 
   return (
-    <div className="bg-slate-100 dark:bg-slate-800 p-4 flex flex-col items-center lg:items-start lg:w-64 sticky top-0 h-screen shadow-lg dark:shadow-none z-20">
-      
-      {/* Logo */}
-      <div className="flex items-center gap-3 mb-8 p-2">
-        <BsClouds className="text-3xl text-blue-500" />
-        <span className="text-xl font-bold hidden lg:inline text-slate-800 dark:text-white">Weather App Riau</span>
+    <div className="bg-slate-800 p-4 flex flex-col items-center lg:items-start lg:w-56 sticky top-0 h-screen">
+      <div className="flex items-center gap-3 mb-10 p-2">
+        <BsClouds className="text-3xl text-white" />
+        <span className="text-xl font-bold hidden lg:inline">Weathers App Riau</span>
       </div>
+      <nav className="flex flex-col gap-4 w-full flex-1">
+        {menuItems.map((item) => (
+          <NavLink
+            key={item.name}
+            to={item.path}
+            className={({ isActive }) => `flex items-center gap-4 p-3 rounded-lg transition-colors text-slate-400 hover:bg-slate-700 hover:text-white ${ isActive ? 'bg-blue-600 text-white' : '' }`}
+          >
+            <span className="text-2xl">{item.icon}</span>
+            <span className="font-semibold hidden lg:inline">{item.name}</span>
+          </NavLink>
+        ))}
 
-      {/* Scrollable Menu Container */}
-      <div className="flex-1 w-full overflow-y-auto pr-2">
-        {/* Main Menu */}
-        <nav className="flex flex-col gap-2 w-full">
-          {menuItems.map((item) => (
-            <NavLink
-              key={item.name}
-              // Jika path adalah /weather, kita navigasi ke kota favorit pertama atau default
-              to={item.name === 'Cuaca' ? `/weather/${getCityDisplayName(favoriteCities[0] || 'Pekanbaru')}` : item.path}
-              className={({ isActive }) =>
-                `flex items-center gap-4 p-3 rounded-lg transition-colors text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white ${
-                  isActive && item.name !== 'Cuaca' ? 'bg-blue-600 !text-white shadow-md' : ''
-                }`
-              }
-            >
-              <span className="text-2xl">{item.icon}</span>
-              <span className="font-semibold hidden lg:inline">{item.name}</span>
-            </NavLink>
-          ))}
-        </nav>
-
-        {/* Favorite Cities List */}
-        <div className="mt-8">
-          <h3 className="px-3 mb-2 text-xs font-semibold text-slate-400 uppercase tracking-wider hidden lg:block">Kota Favorit</h3>
-          <div className="flex flex-col gap-1">
-            {favoriteCities.map(city => (
-              <NavLink
-                key={city}
-                to={`/weather/${getCityDisplayName(city)}`}
-                className={({ isActive }) =>
-                  `flex items-center gap-4 p-3 rounded-lg text-sm transition-colors ${
-                    isActive 
-                      ? 'bg-blue-500/80 text-white' 
-                      : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
-                  }`
-                }
-              >
-                <BsStarFill className="text-yellow-500 flex-shrink-0" />
-                <span className="font-medium hidden lg:inline truncate">{getCityDisplayName(city)}</span>
-              </NavLink>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom Section */}
-      <div className="pt-4 w-full border-t border-slate-200 dark:border-slate-700">
-        {userRole === 'admin' && (
-          <div className="mb-4">
-            <NavLink 
-              to="/admin" 
-              className={({ isActive }) => `flex items-center gap-4 p-3 rounded-lg transition-colors w-full ${ isActive ? 'bg-green-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700' }`}
-            >
+        {currentUser && currentUser.role === 'admin' && (
+           <NavLink 
+             to="/app/admin" // <-- Tambahkan /app di sini juga
+             className={({ isActive }) => `flex items-center gap-4 p-3 mt-4 rounded-lg transition-colors text-slate-400 hover:bg-slate-700 hover:text-white ${ isActive ? 'bg-green-600 text-white' : '' }`}
+           >
               <BsShieldLock className="text-2xl" />
               <span className="font-semibold hidden lg:inline">Admin Panel</span>
-            </NavLink>
-          </div>
+           </NavLink>
         )}
-        <div className="p-2 w-full">
-          <button
-            onClick={handleRoleChange}
-            className="w-full text-center p-3 rounded-lg bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
-          >
-            <p className="text-sm font-bold capitalize text-slate-700 dark:text-slate-300">{userRole}</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Ketuk untuk beralih</p>
-          </button>
-        </div>
+      </nav>
+
+      <div className="pt-4 w-full border-t border-slate-700">
+        {currentUser ? (
+          <div>
+            <p className="px-3 text-xs text-slate-400 truncate" title={currentUser.email}>{currentUser.email}</p>
+            <button onClick={handleLogout} className="w-full flex items-center gap-4 mt-2 p-3 rounded-lg text-slate-400 hover:bg-red-500/20 hover:text-red-400">
+              <BsBoxArrowRight className="text-2xl" />
+              <span className="font-semibold hidden lg:inline">Logout</span>
+            </button>
+          </div>
+        ) : (
+          <Link to="/login" className="w-full flex items-center justify-center p-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700">
+            Login
+          </Link>
+        )}
       </div>
     </div>
   );

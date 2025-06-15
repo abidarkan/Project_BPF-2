@@ -5,16 +5,20 @@ import App from './App.jsx';
 import './index.css';
 import { BrowserRouter } from "react-router-dom";
 import { SettingsProvider } from './context/SettingsContext';
-import { FavoritesProvider } from './context/FavoritesContext'; // <-- Impor provider baru
+import { FavoritesProvider } from './context/FavoritesContext';
+import { UserProvider } from './context/UserContext';
+// import { AuthProvider } from './context/AuthContext'; // <-- HAPUS BARIS INI
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
+    {/* Hapus AuthProvider dari sini juga */}
     <SettingsProvider>
-      {/* Bungkus dengan FavoritesProvider */}
       <FavoritesProvider>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
+        <UserProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </UserProvider>
       </FavoritesProvider>
     </SettingsProvider>
   </React.StrictMode>,
