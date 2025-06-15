@@ -1,29 +1,30 @@
 // src/components/Sidebar.jsx
 import React, { useState, useEffect } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
-import { BsClouds, BsListUl, BsGeoAlt, BsGear, BsCloudSun, BsShieldLock, BsBoxArrowRight } from 'react-icons/bs';
-import { BsInfoCircleFill } from 'react-icons/bs';
-
-// import { FavoritesContext } from '../context/FavoritesContext';
+// import { auth } from '../firebase';
+// import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { BsClouds, BsListUl, BsGeoAlt, BsGear, BsCloudSun, BsShieldLock, BsBoxArrowRight, BsInfoCircleFill } from 'react-icons/bs';
 
 const Sidebar = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const loggedInUser = localStorage.getItem('loggedInUser');
-    if (loggedInUser) {
-      setCurrentUser(JSON.parse(loggedInUser));
-    }
+    const unsubscribe = onAuthStateChanged(auth, user => {
+      setCurrentUser(user);
+    });
+    return unsubscribe;
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('loggedInUser');
-    setCurrentUser(null);
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate('/login');
+    } catch (error) {
+      console.error("Gagal untuk logout", error);
+    }
   };
 
-  // --- PERUBAHAN DI SINI: Semua path sekarang diawali dengan /app ---
   const menuItems = [
     { icon: <BsCloudSun />, name: 'Cuaca', path: '/app/weather/Pekanbaru' },
     { icon: <BsListUl />, name: 'Kota', path: '/app/cities' },
@@ -33,27 +34,37 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="bg-slate-800 p-4 flex flex-col items-center lg:items-start lg:w-56 sticky top-0 h-screen">
+    // --- PERUBAHAN DI SINI ---
+    <div className="bg-slate-100 dark:bg-slate-800 p-4 flex flex-col items-center lg:items-start lg:w-56 sticky top-0 h-screen shadow-lg dark:shadow-none">
+      
+      {/* Logo */}
       <div className="flex items-center gap-3 mb-10 p-2">
-        <BsClouds className="text-3xl text-white" />
-        <span className="text-xl font-bold hidden lg:inline">Weathers App Riau</span>
+        <BsClouds className="text-3xl text-blue-500" />
+        <span className="text-xl font-bold hidden lg:inline text-slate-800 dark:text-white">Weatherly</span>
       </div>
+
+      {/* Menu */}
       <nav className="flex flex-col gap-4 w-full flex-1">
         {menuItems.map((item) => (
           <NavLink
             key={item.name}
             to={item.path}
-            className={({ isActive }) => `flex items-center gap-4 p-3 rounded-lg transition-colors text-slate-400 hover:bg-slate-700 hover:text-white ${ isActive ? 'bg-blue-600 text-white' : '' }`}
+            className={({ isActive }) =>
+              `flex items-center gap-4 p-3 rounded-lg transition-colors text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white ${
+                isActive ? 'bg-blue-600 !text-white shadow-md' : ''
+              }`
+            }
           >
             <span className="text-2xl">{item.icon}</span>
             <span className="font-semibold hidden lg:inline">{item.name}</span>
           </NavLink>
         ))}
 
-        {currentUser && currentUser.role === 'admin' && (
+        {/* Menu Admin */}
+        {currentUser && currentUser.email === 'admin@example.com' && (
            <NavLink 
-             to="/app/admin" // <-- Tambahkan /app di sini juga
-             className={({ isActive }) => `flex items-center gap-4 p-3 mt-4 rounded-lg transition-colors text-slate-400 hover:bg-slate-700 hover:text-white ${ isActive ? 'bg-green-600 text-white' : '' }`}
+             to="/app/admin" 
+             className={({ isActive }) => `flex items-center gap-4 p-3 mt-4 rounded-lg transition-colors text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white ${ isActive ? 'bg-green-600 text-white' : '' }`}
            >
               <BsShieldLock className="text-2xl" />
               <span className="font-semibold hidden lg:inline">Admin Panel</span>
@@ -61,11 +72,12 @@ const Sidebar = () => {
         )}
       </nav>
 
-      <div className="pt-4 w-full border-t border-slate-700">
+      {/* Bagian Bawah Sidebar */}
+      <div className="pt-4 w-full border-t border-slate-200 dark:border-slate-700">
         {currentUser ? (
           <div>
-            <p className="px-3 text-xs text-slate-400 truncate" title={currentUser.email}>{currentUser.email}</p>
-            <button onClick={handleLogout} className="w-full flex items-center gap-4 mt-2 p-3 rounded-lg text-slate-400 hover:bg-red-500/20 hover:text-red-400">
+            <p className="px-3 text-xs text-slate-500 dark:text-slate-400 truncate" title={currentUser.email}>{currentUser.email}</p>
+            <button onClick={handleLogout} className="w-full flex items-center gap-4 mt-2 p-3 rounded-lg text-red-500 hover:bg-red-500/10">
               <BsBoxArrowRight className="text-2xl" />
               <span className="font-semibold hidden lg:inline">Logout</span>
             </button>
