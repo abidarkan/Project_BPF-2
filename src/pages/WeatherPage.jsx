@@ -2,16 +2,13 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { SettingsContext } from '../context/SettingsContext';
-import { FavoritesContext } from '../context/FavoritesContext';
 import ForecastItem from '../components/ForecastItem';
 import HourlyChart from '../components/HourlyChart';
-import { BsWind, BsDroplet, BsSun, BsStar, BsStarFill } from 'react-icons/bs';
+import { BsWind, BsDroplet, BsSun } from 'react-icons/bs';
 
 const WeatherPage = () => {
   const { cityName } = useParams();
-  const navigate = useNavigate();
   const { units } = useContext(SettingsContext);
-  const { favoriteCities, addFavorite, removeFavorite } = useContext(FavoritesContext);
   const unitSymbol = units === 'metric' ? '°C' : '°F';
   
   const [currentWeather, setCurrentWeather] = useState(null);
@@ -21,24 +18,17 @@ const WeatherPage = () => {
 
   const API_KEY = 'e36f009e055d14d197eb428b19b26fed';
 
-  // --- FUNGSI BARU YANG LEBIH PINTAR ---
-  const getCityDisplayName = (city) => {
-    // Menghapus "Kota ", "Kabupaten ", dan ",ID" untuk nama yang bersih
-    return city.replace("Kota ", "").replace("Kabupaten ", "").split(',')[0];
-  };
-  
   useEffect(() => {
     const fetchAllData = async () => {
       setLoading(true);
       setError(null);
-      // Gunakan nama kota yang sudah dibersihkan untuk API call
-      const cityToFetch = getCityDisplayName(cityName || 'Pekanbaru'); 
+      const cityToFetch = cityName || 'Pekanbaru';
       
       const currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${cityToFetch},ID&appid=${API_KEY}&units=${units}&lang=id`;
       const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${cityToFetch},ID&appid=${API_KEY}&units=${units}&lang=id`;
       try {
         const [currentWeatherRes, forecastRes] = await Promise.all([ fetch(currentWeatherUrl), fetch(forecastUrl) ]);
-        if (!currentWeatherRes.ok || !forecastRes.ok) { throw new Error('Kota tidak ditemukan. Coba nama lain.'); }
+        if (!currentWeatherRes.ok || !forecastRes.ok) { throw new Error('Kota tidak ditemukan.'); }
         const currentWeatherData = await currentWeatherRes.json();
         const forecastData = await forecastRes.json();
         setCurrentWeather(currentWeatherData);
@@ -54,18 +44,6 @@ const WeatherPage = () => {
     fetchAllData();
   }, [cityName, units]);
 
-  const isFavorite = currentWeather && favoriteCities.includes(currentWeather.name);
-
-  const handleFavoriteToggle = () => {
-    if (!currentWeather) return;
-    const cleanName = getCityDisplayName(currentWeather.name);
-    if (isFavorite) {
-      removeFavorite(cleanName);
-    } else {
-      addFavorite(cleanName);
-    }
-  };
-
   const DetailCard = ({ icon, title, value }) => (
     <div className="flex items-center gap-4">
       <span className="text-2xl text-slate-500 dark:text-slate-400">{icon}</span>
@@ -78,28 +56,6 @@ const WeatherPage = () => {
 
   return (
     <div className="animate-fade-in-up">
-      {/* --- TOMBOL FAVORIT DENGAN NAVIGASI YANG DIPERBAIKI --- */}
-      <div className="flex flex-wrap items-center gap-3 mb-8 border-b-2 border-slate-200 dark:border-slate-700 pb-4">
-        <h2 className="text-sm font-bold text-slate-400 mr-4">KOTA FAVORIT:</h2>
-        {favoriteCities.map(city => {
-          const cleanCityName = getCityDisplayName(city);
-          return (
-            <button
-              key={cleanCityName}
-              onClick={() => navigate(`/app/weather/${cleanCityName}`)}
-              className={`px-4 py-2 rounded-full font-semibold transition-colors duration-300
-                ${cleanCityName === cityName
-                  ? 'bg-blue-600 text-white shadow-lg'
-                  : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600'
-                }`}
-            >
-              {cleanCityName}
-            </button>
-          )
-        })}
-      </div>
-
-      {/* Sisa JSX tetap sama */}
       {loading && <div className="flex justify-center items-center h-full"><p className="text-xl">Memuat...</p></div>}
       {error && !loading && <div className="flex justify-center items-center h-full"><p className="text-xl text-red-500">{error}</p></div>}
       
@@ -111,9 +67,7 @@ const WeatherPage = () => {
               <p className="text-slate-500 dark:text-slate-400">Peluang Hujan: {currentWeather.clouds.all}%</p>
               <p className="text-8xl font-thin my-4">{Math.round(currentWeather.main.temp)}{unitSymbol}</p>
             </div>
-            <button onClick={handleFavoriteToggle} className="text-2xl text-yellow-400 hover:scale-110 transition-transform" title="Tambah/Hapus Favorit">
-              {isFavorite ? <BsStarFill /> : <BsStar />}
-            </button>
+            <img src={`https://openweathermap.org/img/wn/${currentWeather.weather[0].icon}@4x.png`} alt="ikon cuaca" className="w-40 h-40" />
           </div>
 
           <div className="lg:row-span-2 bg-slate-100 dark:bg-slate-800 p-6 rounded-2xl shadow-lg dark:shadow-none">

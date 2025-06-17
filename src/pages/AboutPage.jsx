@@ -2,7 +2,7 @@
 import React from 'react';
 // --- PERUBAHAN DI BARIS IMPOR DI BAWAH INI ---
 import { FaReact } from 'react-icons/fa';
-import { SiVite, SiTailwindcss, SiLeaflet } from 'react-icons/si';
+import { SiVite, SiTailwindcss, SiLeaflet, SiSupabase } from 'react-icons/si';
 import { BsCloudyFill, BsBarChartFill } from 'react-icons/bs'; // Hapus SiRecharts, tambahkan BsBarChartFill
 
 const TechCard = ({ icon, name, description }) => (
@@ -19,16 +19,16 @@ const AboutPage = () => {
   return (
     <div className="animate-fade-in-up space-y-8">
       <div>
-        <h1 className="text-4xl font-bold mb-2">Tentang Weathers App Riau</h1>
+        <h1 className="text-4xl font-bold mb-2">Tentang Weatherly</h1>
         <p className="text-lg text-slate-600 dark:text-slate-400">
-          Aplikasi dashboard cuaca khusus Riau yang menyediakan data cuaca real-time dan ramalan.
+          Aplikasi dashboard cuaca modern yang menyediakan data cuaca real-time dan ramalan akurat.
         </p>
       </div>
 
       <div className="bg-slate-100 dark:bg-slate-800 p-6 rounded-2xl shadow-lg">
         <h2 className="text-2xl font-bold mb-4">Misi Kami</h2>
         <p className="text-slate-600 dark:text-slate-300">
-          Misi kami adalah menyajikan data cuaca disekitaran Riau.
+          Misi kami adalah menyajikan data cuaca yang kompleks dalam antarmuka yang indah, cepat, dan mudah dipahami. Kami percaya bahwa akses mudah terhadap informasi cuaca dapat membantu semua orang merencanakan hari mereka dengan lebih baik, mulai dari aktivitas sehari-hari hingga perjalanan penting.
         </p>
       </div>
       
@@ -40,7 +40,7 @@ const AboutPage = () => {
             </div>
             <div>
                 <h3 className="text-xl font-bold">Abid Asyam Arkan</h3>
-                <p className="text-slate-600 dark:text-slate-400">Full-Stack Developer & UI/UX </p>
+                <p className="text-slate-600 dark:text-slate-400">Full-Stack Developer & UI/UX Enthusiast</p>
             </div>
         </div>
       </div>
@@ -55,6 +55,7 @@ const AboutPage = () => {
           <TechCard icon={<BsBarChartFill />} name="Recharts" description="Library charting untuk membuat grafik yang indah dan interaktif." />
           <TechCard icon={<SiLeaflet />} name="Leaflet" description="Library JavaScript untuk peta interaktif yang ramah mobile." />
           <TechCard icon={<BsCloudyFill />} name="OpenWeatherMap API" description="Sumber data untuk semua informasi cuaca dan ramalan." />
+          <TechCard icon={<SiSupabase />} name="Supabase" description="Platform Backend-as-a-Service untuk database dan otentikasi." />
         </div>
       </div>
     </div>

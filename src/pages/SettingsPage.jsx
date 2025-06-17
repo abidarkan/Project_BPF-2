@@ -47,7 +47,7 @@ const SettingsPage = () => {
 
       {/* Pengaturan Tema */}
       {/* --- PERUBAHAN DI SINI --- */}
-      <div className="bg-slate-100 dark:bg-slate-800 p-6 rounded-2xl shadow-lg dark:shadow-none">
+      {/* <div className="bg-slate-100 dark:bg-slate-800 p-6 rounded-2xl shadow-lg dark:shadow-none">
         <div className="flex items-center gap-4 mb-4">
           <BsSunFill className="text-2xl text-yellow-500 dark:text-yellow-400" />
           <h2 className="text-xl font-bold">Tema Tampilan</h2>
@@ -70,7 +70,7 @@ const SettingsPage = () => {
             <BsMoonFill /> Gelap
           </button>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

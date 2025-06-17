@@ -1,16 +1,17 @@
 // src/components/ProtectedRoute.jsx
 import React from 'react';
 import { Navigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const ProtectedRoute = ({ children }) => {
-  const user = localStorage.getItem('loggedInUser');
+  const { currentUser } = useAuth();
 
-  if (!user) {
-    // Jika tidak ada data pengguna di localStorage, arahkan ke halaman login
+  if (!currentUser) {
+    // Jika tidak ada pengguna yang login, arahkan ke halaman login
     return <Navigate to="/login" replace />;
   }
 
-  // Jika ada data pengguna, tampilkan halaman yang diminta
+  // Jika ada pengguna, tampilkan halaman yang diminta
   return children;
 };
 
