@@ -3,6 +3,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { Toaster } from 'react-hot-toast';
+import Footer from '../components/footer';
 import { useAuth } from '../context/AuthContext'; // Ganti dengan useSettings jika tema ada di sana
 
 const MainLayout = () => {
@@ -25,6 +26,8 @@ const MainLayout = () => {
         <Sidebar />
         <main className="flex-1 p-6 lg:p-10">
           <Outlet /> {/* <-- Konten halaman akan dirender di sini */}
+
+          <Footer/>
         </main>
       </div>
     </div>
