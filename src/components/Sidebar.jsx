@@ -58,7 +58,7 @@ const Sidebar = () => {
       {/* Logo */}
       <div className="flex items-center gap-3 mb-8 p-2">
         <BsClouds className="text-3xl text-blue-500" />
-        <span className="text-xl font-bold hidden lg:inline text-slate-800 dark:text-white">Weatherly</span>
+        <span className="text-xl font-bold hidden lg:inline text-slate-800 dark:text-white">Weather App Riau</span>
       </div>
 
       <div className="flex-1 w-full overflow-y-auto pr-2">
