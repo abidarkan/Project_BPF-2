@@ -15,6 +15,7 @@ import SettingsPage from "./pages/SettingsPage";
 import AdminPage from "./pages/AdminPage";
 import AboutPage from "./pages/AboutPage";
 import ErrorPage from "./pages/ErrorPage";
+import ContactPage from "./pages/ContactPage";
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
         <Route path="settings" element={<SettingsPage />} />
         <Route path="admin" element={<AdminPage />} />
         <Route path="about" element={<AboutPage />} />
+        <Route path="contact" element={<ContactPage />} />
       </Route>
 
       {/* Rute Fallback / 404 */}

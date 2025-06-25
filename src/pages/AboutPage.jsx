@@ -42,6 +42,20 @@ const AboutPage = () => {
                 <h3 className="text-xl font-bold">Abid Asyam Arkan</h3>
                 <p className="text-slate-600 dark:text-slate-400">Full-Stack Developer & UI/UX Enthusiast</p>
             </div>
+            <div className="w-20 h-20 bg-slate-700 rounded-full flex items-center justify-center">
+                <span className="text-3xl">👨‍💻</span>
+            </div>
+            <div>
+                <h3 className="text-xl font-bold">Abimanyu Ananta Wijaya</h3>
+                <p className="text-slate-600 dark:text-slate-400">Frontend Developer</p>
+            </div>
+            <div className="w-20 h-20 bg-slate-700 rounded-full flex items-center justify-center">
+                <span className="text-3xl">👨‍💻</span>
+            </div>
+            <div>
+                <h3 className="text-xl font-bold">Abduh Jamil Al-Ghifari</h3>
+                <p className="text-slate-600 dark:text-slate-400">Backend Developer</p>
+            </div>
         </div>
       </div>
 

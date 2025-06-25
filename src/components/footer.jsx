@@ -1,5 +1,6 @@
 // src/components/Footer.jsx
 import React from 'react';
+import { MdEmail } from "react-icons/md";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -9,6 +10,7 @@ const Footer = () => {
       <p className="text-sm text-slate-500 dark:text-slate-400">
         © {currentYear} Weather App Riau. All Rights Reserved.
       </p>
+      <MdEmail/>
     </footer>
   );
 };

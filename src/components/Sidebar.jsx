@@ -10,7 +10,8 @@ import {
   BsShieldLock, 
   BsBoxArrowRight,
   BsInfoCircleFill,
-  BsPinMapFill
+  BsPinMapFill,
+  BsFillTelephoneFill
 } from 'react-icons/bs';
 
 const Sidebar = () => {
@@ -47,6 +48,7 @@ const Sidebar = () => {
     { icon: <BsGeoAlt />, name: 'Peta', path: '/app/map' },
     { icon: <BsGear />, name: 'Pengaturan', path: '/app/settings' },
     { icon: <BsInfoCircleFill />, name: 'Tentang', path: '/app/about' },
+    { icon: <BsFillTelephoneFill />, name: 'Kontak Kami', path: '/app/contact' },
   ];
   
   // Cek apakah path saat ini berada di bawah /app/weather
