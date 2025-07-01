@@ -19,7 +19,7 @@ const AboutPage = () => {
   return (
     <div className="animate-fade-in-up space-y-8">
       <div>
-        <h1 className="text-4xl font-bold mb-2">Tentang Weatherly</h1>
+        <h1 className="text-4xl font-bold mb-2">Tentang Weather App Riau</h1>
         <p className="text-lg text-slate-600 dark:text-slate-400">
           Aplikasi dashboard cuaca modern yang menyediakan data cuaca real-time dan ramalan akurat.
         </p>
