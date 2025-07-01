@@ -1,4 +1,3 @@
-// src/App.jsx
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 
@@ -9,13 +8,13 @@ import RegisterPage from './pages/auth/RegisterPage';
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import WeatherPage from "./pages/WeatherPage.jsx";
-// import CitiesPage from "./pages/CitiesPage"; // <-- Hapus impor ini
 import MapPage from "./pages/MapPage";
 import SettingsPage from "./pages/SettingsPage";
 import AdminPage from "./pages/AdminPage";
 import AboutPage from "./pages/AboutPage";
 import ErrorPage from "./pages/ErrorPage";
-import ContactPage from "./pages/ContactPage";
+import ContactPage from "./pages/ContactPage"; // <-- Impor halaman baru
+import AdminMessagesPage from "./pages/AdminMessagesPage"; // <-- Impor halaman baru
 
 function App() {
   return (
@@ -34,13 +33,16 @@ function App() {
           </ProtectedRoute>
         }
       >
+        <Route index element={<Navigate to="weather/Pekanbaru" replace />} />
         <Route path="weather/:cityName" element={<WeatherPage />} />
-        {/* <Route path="cities" element={<CitiesPage />} /> */} {/* <-- Hapus rute ini */}
         <Route path="map" element={<MapPage />} />
         <Route path="settings" element={<SettingsPage />} />
-        <Route path="admin" element={<AdminPage />} />
         <Route path="about" element={<AboutPage />} />
-        <Route path="contact" element={<ContactPage />} />
+        <Route path="contact" element={<ContactPage />} /> {/* <-- Tambahkan rute ini */}
+        
+        {/* Rute Khusus Admin */}
+        <Route path="admin" element={<AdminPage />} />
+        <Route path="admin/messages" element={<AdminMessagesPage />} /> {/* <-- Tambahkan rute ini */}
       </Route>
 
       {/* Rute Fallback / 404 */}

@@ -1,4 +1,3 @@
-// src/context/AuthContext.jsx
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { supabase } from '../supabaseClient';
 
@@ -12,14 +11,11 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Fungsi signup sekarang menerima metadata
   const signup = (email, password, metadata) => {
     return supabase.auth.signUp({ 
       email, 
       password,
-      options: {
-        data: metadata // <-- Simpan nama lengkap sebagai metadata
-      }
+      options: { data: metadata }
     });
   };
 
@@ -32,13 +28,21 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setCurrentUser(session?.user ?? null);
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session?.user) {
+        // Jika pengguna login, ambil profilnya dari database
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+        
+        // Gabungkan data otentikasi dengan data profil
+        setCurrentUser({ ...session.user, ...profile });
+      } else {
+        setCurrentUser(null);
+      }
       setLoading(false);
-    });
-
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setCurrentUser(session?.user ?? null);
     });
 
     return () => {

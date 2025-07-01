@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom'; // <-- Impor Link untuk navigasi
 import { supabase } from '../supabaseClient';
 import toast from 'react-hot-toast';
-import { BsPencilFill, BsTrash, BsPlusLg, BsExclamationTriangleFill } from 'react-icons/bs';
+import { BsPencilFill, BsTrash, BsPlusLg, BsExclamationTriangleFill, BsEnvelopeFill } from 'react-icons/bs';
 
 // --- Komponen Modal Konfirmasi (Untuk Hapus) ---
 const ConfirmationModal = ({ onConfirm, onCancel, loading }) => {
@@ -33,8 +34,8 @@ const UserForm = ({ onClose, onSave, user, loading }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!email.trim() || (!user && !password.trim())) {
-      toast.error('Nama Lengkap, Email, dan Password wajib diisi untuk pengguna baru.');
+    if (!fullName.trim() || !email.trim() || (!user && !password.trim())) {
+      toast.error('Semua kolom wajib diisi untuk pengguna baru.');
       return;
     }
     onSave({ id: user?.id, email, password, role, fullName });
@@ -102,13 +103,11 @@ const AdminPage = () => {
   const handleSaveUser = async (userData) => {
     setActionLoading(true);
     try {
-      if (userToAction && userToAction.id) { // Mode Edit
-        const { error } = await supabase.functions.invoke('update-user', { 
-          body: { ...userData, id: userToAction.id } 
-        });
+      if (userToAction && userToAction.id) {
+        const { error } = await supabase.functions.invoke('update-user', { body: { ...userData, id: userToAction.id } });
         if (error) throw error;
         toast.success('Pengguna berhasil diperbarui.');
-      } else { // Mode Tambah
+      } else {
         const { error } = await supabase.functions.invoke('create-user', { body: userData });
         if (error) throw error;
         toast.success('Pengguna baru berhasil ditambahkan.');
@@ -121,7 +120,7 @@ const AdminPage = () => {
       setActionLoading(false);
     }
   };
-  
+
   const handleDeleteRequest = (user) => {
     setUserToAction(user);
     setIsConfirmModalOpen(true);
@@ -134,9 +133,7 @@ const AdminPage = () => {
         const { error } = await supabase.functions.invoke('delete-user', {
           body: { targetUserId: userToAction.id },
         });
-
         if (error) throw error;
-        
         setProfiles(prev => prev.filter(p => p.id !== userToAction.id));
         toast.success('Pengguna berhasil dihapus.');
       } catch (error) {
@@ -153,71 +150,88 @@ const AdminPage = () => {
     setUserToAction(null);
     setIsFormModalOpen(true);
   };
-  
+
   const openEditModal = (user) => {
     setUserToAction(user);
     setIsFormModalOpen(true);
   };
-  
+
   const closeFormModal = () => {
     setIsFormModalOpen(false);
     setUserToAction(null);
   };
 
   return (
-    <div className="animate-fade-in-up">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Manajemen Pengguna</h1>
-        <button onClick={openAddModal} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-lg">
-          <BsPlusLg />
-          <span>Tambah Pengguna</span>
-        </button>
+    <div className="animate-fade-in-up space-y-8">
+      <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+
+      {/* --- KARTU NAVIGASI PESAN MASUK --- */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Link
+          to="/app/admin/messages"
+          className="bg-slate-100 dark:bg-slate-800 p-6 rounded-2xl flex items-center gap-6 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shadow-lg"
+        >
+          <BsEnvelopeFill className="text-4xl text-blue-500" />
+          <div>
+            <h2 className="text-xl font-bold">Pesan Masuk</h2>
+            <p className="text-slate-500 dark:text-slate-400">Lihat pesan dari pengguna.</p>
+          </div>
+        </Link>
+        {/* Anda bisa menambahkan kartu navigasi lain di sini */}
       </div>
 
-      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg overflow-hidden">
-        {loading ? (
-          <p className="p-6 text-center text-slate-500">Memuat data pengguna dari Supabase...</p>
-        ) : (
-          <table className="w-full text-left">
-            <thead className="bg-slate-100 dark:bg-slate-700/50">
-              <tr>
-                <th className="p-4 font-bold text-slate-600 dark:text-slate-300">Nama Lengkap</th>
-                <th className="p-4 font-bold text-slate-600 dark:text-slate-300">Email</th>
-                <th className="p-4 font-bold text-slate-600 dark:text-slate-300">Peran</th>
-                <th className="p-4 font-bold text-slate-600 dark:text-slate-300 text-right">Aksi</th>
-              </tr>
-            </thead>
-            <tbody className="text-slate-700 dark:text-slate-300">
-              {profiles.map(profile => (
-                <tr key={profile.id} className="border-b border-slate-200 dark:border-slate-700 last:border-b-0">
-                  <td className="p-4">{profile.full_name || '(Tidak ada nama)'}</td>
-                  <td className="p-4">{profile.email}</td>
-                  <td className="p-4">
-                    {/* Di sini kita tidak lagi bisa mengubah peran secara langsung */}
-                    <span className="capitalize bg-slate-200 dark:bg-slate-700 px-2 py-1 rounded-full text-sm">
-                      {profile.role}
-                    </span>
-                  </td>
-                  <td className="p-4 flex justify-end gap-4">
-                    <button onClick={() => openEditModal(profile)} className="text-yellow-500 hover:text-yellow-600 dark:text-yellow-400 dark:hover:text-yellow-300 transition-colors" title="Edit"><BsPencilFill /></button>
-                    <button onClick={() => handleDeleteRequest(profile)} className="text-red-500 hover:text-red-600 dark:text-red-500 dark:hover:text-red-400 transition-colors" title="Hapus"><BsTrash /></button>
-                  </td>
+      {/* --- BAGIAN MANAJEMEN PENGGUNA --- */}
+      <div>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold">Manajemen Pengguna</h2>
+          <button onClick={openAddModal} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-lg">
+            <BsPlusLg />
+            <span>Tambah Pengguna</span>
+          </button>
+        </div>
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg overflow-hidden">
+          {loading ? (
+            <p className="p-6 text-center text-slate-500">Memuat data pengguna...</p>
+          ) : (
+            <table className="w-full text-left">
+              <thead className="bg-slate-100 dark:bg-slate-700/50">
+                <tr>
+                  <th className="p-4 font-bold text-slate-600 dark:text-slate-300">Nama Lengkap</th>
+                  <th className="p-4 font-bold text-slate-600 dark:text-slate-300">Email</th>
+                  <th className="p-4 font-bold text-slate-600 dark:text-slate-300">Peran</th>
+                  <th className="p-4 font-bold text-slate-600 dark:text-slate-300 text-right">Aksi</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+              </thead>
+              <tbody className="text-slate-700 dark:text-slate-300">
+                {profiles.map(profile => (
+                  <tr key={profile.id} className="border-b border-slate-200 dark:border-slate-700 last:border-b-0">
+                    <td className="p-4">{profile.full_name || '(Belum diisi)'}</td>
+                    <td className="p-4">{profile.email}</td>
+                    <td className="p-4">
+                      <span className="capitalize bg-slate-200 dark:bg-slate-700 px-3 py-1 rounded-full text-sm font-medium">
+                        {profile.role}
+                      </span>
+                    </td>
+                    <td className="p-4 flex justify-end gap-4">
+                      <button onClick={() => openEditModal(profile)} className="text-yellow-500 hover:text-yellow-600 dark:text-yellow-400 dark:hover:text-yellow-300 transition-colors" title="Edit"><BsPencilFill /></button>
+                      <button onClick={() => handleDeleteRequest(profile)} className="text-red-500 hover:text-red-600 dark:text-red-500 dark:hover:text-red-400 transition-colors" title="Hapus"><BsTrash /></button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
       </div>
 
       {isFormModalOpen && (
-        <UserForm 
-          onClose={closeFormModal} 
+        <UserForm
+          onClose={closeFormModal}
           onSave={handleSaveUser}
-          user={userToAction} 
+          user={userToAction}
           loading={actionLoading}
         />
       )}
-
       {isConfirmModalOpen && (
         <ConfirmationModal
           onConfirm={confirmDelete}

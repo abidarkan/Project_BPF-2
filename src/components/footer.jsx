@@ -8,9 +8,9 @@ const Footer = () => {
   return (
     <footer className="w-full py-6 text-center">
       <p className="text-sm text-slate-500 dark:text-slate-400">
-        © {currentYear} Weather App Riau. All Rights Reserved.
+        © {currentYear} Weatherly. All Rights Reserved.
       </p>
-      <MdEmail/>
+      
     </footer>
   );
 };
