@@ -1,10 +1,9 @@
-// src/pages/WeatherPage.jsx
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { SettingsContext } from '../context/SettingsContext';
 import ForecastItem from '../components/ForecastItem';
 import HourlyChart from '../components/HourlyChart';
-import { BsWind, BsDroplet, BsSun } from 'react-icons/bs';
+import { BsWind, BsDroplet, BsSun, BsStar, BsStarFill } from 'react-icons/bs';
 
 const WeatherPage = () => {
   const { cityName } = useParams();
@@ -16,7 +15,7 @@ const WeatherPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const API_KEY = 'e36f009e055d14d197eb428b19b26fed';
+  const API_KEY = 'e36f009e055d14d197eb428b19b26fed'; 
 
   useEffect(() => {
     const fetchAllData = async () => {
@@ -46,28 +45,34 @@ const WeatherPage = () => {
 
   const DetailCard = ({ icon, title, value }) => (
     <div className="flex items-center gap-4">
-      <span className="text-2xl text-slate-500 dark:text-slate-400">{icon}</span>
+      <span className="text-xl text-slate-500 dark:text-slate-400">{icon}</span>
       <div>
         <p className="text-slate-500 dark:text-slate-400 text-sm">{title}</p>
-        <p className="font-bold text-lg text-slate-800 dark:text-white">{value}</p>
+        <p className="font-bold text-base">{value}</p>
       </div>
     </div>
   );
 
   return (
-    <div className="animate-fade-in-up">
-      {loading && <div className="flex justify-center items-center h-full"><p className="text-xl">Memuat...</p></div>}
-      {error && !loading && <div className="flex justify-center items-center h-full"><p className="text-xl text-red-500">{error}</p></div>}
+    <div className="animate-fade-in-up space-y-6">
+      {/* Container untuk Tombol Favorit di Halaman Cuaca */}
+      {/* Logika ini bisa ditambahkan jika Anda ingin tombol favorit di halaman ini */}
+
+      {loading && <div className="text-center p-10"><p className="text-xl">Memuat...</p></div>}
+      {error && !loading && <div className="text-center p-10"><p className="text-xl text-red-500">{error}</p></div>}
       
       {currentWeather && forecast && !loading && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 lg:grid-rows-2 gap-6">
-          <div className="lg:col-span-2 bg-slate-100 dark:bg-slate-800 p-6 rounded-2xl flex justify-between items-start shadow-lg dark:shadow-none">
+        // --- PERUBAHAN UTAMA DI SINI ---
+        // Layout sekarang menjadi 'flex flex-col' di layar kecil, dan 'grid' di layar besar (lg)
+        <div className="flex flex-col lg:grid lg:grid-cols-3 lg:grid-rows-2 gap-6">
+          
+          <div className="lg:col-span-2 bg-slate-100 dark:bg-slate-800 p-6 rounded-2xl flex justify-between items-center shadow-lg dark:shadow-none">
             <div>
-              <h2 className="text-3xl font-bold">{currentWeather.name}</h2>
+              <h2 className="text-2xl lg:text-3xl font-bold">{currentWeather.name}</h2>
               <p className="text-slate-500 dark:text-slate-400">Peluang Hujan: {currentWeather.clouds.all}%</p>
-              <p className="text-8xl font-thin my-4">{Math.round(currentWeather.main.temp)}{unitSymbol}</p>
+              <p className="text-7xl lg:text-8xl font-thin my-4">{Math.round(currentWeather.main.temp)}{unitSymbol}</p>
             </div>
-            <img src={`https://openweathermap.org/img/wn/${currentWeather.weather[0].icon}@4x.png`} alt="ikon cuaca" className="w-40 h-40" />
+            <img src={`https://openweathermap.org/img/wn/${currentWeather.weather[0].icon}@4x.png`} alt="ikon cuaca" className="w-28 h-28 lg:w-40 lg:h-40" />
           </div>
 
           <div className="lg:row-span-2 bg-slate-100 dark:bg-slate-800 p-6 rounded-2xl shadow-lg dark:shadow-none">
@@ -92,6 +97,7 @@ const WeatherPage = () => {
               <DetailCard icon={<BsSun />} title="Indeks UV" value="N/A" />
             </div>
           </div>
+
         </div>
       )}
     </div>

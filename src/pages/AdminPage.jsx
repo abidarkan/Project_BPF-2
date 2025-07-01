@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom'; // <-- Impor Link untuk navigasi
+import { Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import toast from 'react-hot-toast';
 import { BsPencilFill, BsTrash, BsPlusLg, BsExclamationTriangleFill, BsEnvelopeFill } from 'react-icons/bs';
@@ -29,7 +29,7 @@ const ConfirmationModal = ({ onConfirm, onCancel, loading }) => {
 const UserForm = ({ onClose, onSave, user, loading }) => {
   const [email, setEmail] = useState(user ? user.email : '');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState(user ? user.role : 'user');
+  const [role, setRole] = useState(user ? user.role || 'user' : 'user');
   const [fullName, setFullName] = useState(user ? user.full_name || '' : '');
 
   const handleSubmit = (e) => {
@@ -120,7 +120,7 @@ const AdminPage = () => {
       setActionLoading(false);
     }
   };
-
+  
   const handleDeleteRequest = (user) => {
     setUserToAction(user);
     setIsConfirmModalOpen(true);
@@ -150,12 +150,12 @@ const AdminPage = () => {
     setUserToAction(null);
     setIsFormModalOpen(true);
   };
-
+  
   const openEditModal = (user) => {
     setUserToAction(user);
     setIsFormModalOpen(true);
   };
-
+  
   const closeFormModal = () => {
     setIsFormModalOpen(false);
     setUserToAction(null);
@@ -165,10 +165,9 @@ const AdminPage = () => {
     <div className="animate-fade-in-up space-y-8">
       <h1 className="text-3xl font-bold">Admin Dashboard</h1>
 
-      {/* --- KARTU NAVIGASI PESAN MASUK --- */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Link
-          to="/app/admin/messages"
+        <Link 
+          to="/app/admin/messages" 
           className="bg-slate-100 dark:bg-slate-800 p-6 rounded-2xl flex items-center gap-6 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shadow-lg"
         >
           <BsEnvelopeFill className="text-4xl text-blue-500" />
@@ -177,10 +176,8 @@ const AdminPage = () => {
             <p className="text-slate-500 dark:text-slate-400">Lihat pesan dari pengguna.</p>
           </div>
         </Link>
-        {/* Anda bisa menambahkan kartu navigasi lain di sini */}
       </div>
 
-      {/* --- BAGIAN MANAJEMEN PENGGUNA --- */}
       <div>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">Manajemen Pengguna</h2>
@@ -207,10 +204,10 @@ const AdminPage = () => {
                   <tr key={profile.id} className="border-b border-slate-200 dark:border-slate-700 last:border-b-0">
                     <td className="p-4">{profile.full_name || '(Belum diisi)'}</td>
                     <td className="p-4">{profile.email}</td>
-                    <td className="p-4">
-                      <span className="capitalize bg-slate-200 dark:bg-slate-700 px-3 py-1 rounded-full text-sm font-medium">
-                        {profile.role}
-                      </span>
+                    <td className="p-4 capitalize">
+                      {/* --- PERUBAHAN DI SINI --- */}
+                      {/* Jika profile.role kosong, tampilkan 'user' */}
+                      {profile.role || 'user'}
                     </td>
                     <td className="p-4 flex justify-end gap-4">
                       <button onClick={() => openEditModal(profile)} className="text-yellow-500 hover:text-yellow-600 dark:text-yellow-400 dark:hover:text-yellow-300 transition-colors" title="Edit"><BsPencilFill /></button>
